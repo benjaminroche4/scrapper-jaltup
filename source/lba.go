@@ -1,8 +1,8 @@
-package sources
+package source
 
 import (
 	"scrapperjaltup/model"
-	lba "scrapperjaltup/sources/labonnealternance"
+	lba "scrapperjaltup/source/labonnealternance"
 	"scrapperjaltup/util"
 	"time"
 

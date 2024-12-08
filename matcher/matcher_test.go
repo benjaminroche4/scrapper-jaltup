@@ -4,7 +4,7 @@ import (
 	"errors"
 	_db "scrapperjaltup/db"
 	"scrapperjaltup/model"
-	"scrapperjaltup/sources"
+	"scrapperjaltup/source"
 
 	"scrapperjaltup/matcher"
 	"testing"
@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func prepare() (*_db.Mock, *sources.Mock) {
+func prepare() (*_db.Mock, *source.Mock) {
 	db := _db.NewMock().(*_db.Mock)
-	source := sources.NewMock().(*sources.Mock)
+	source := source.NewMock().(*source.Mock)
 
 	return db, source
 }

@@ -3,7 +3,7 @@ package labonnealternance_test
 import (
 	"fmt"
 	"scrapperjaltup/model"
-	"scrapperjaltup/sources/labonnealternance"
+	"scrapperjaltup/source/labonnealternance"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

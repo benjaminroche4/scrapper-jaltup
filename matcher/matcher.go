@@ -4,15 +4,15 @@ import (
 	"log"
 	_db "scrapperjaltup/db"
 	"scrapperjaltup/model"
-	"scrapperjaltup/sources"
+	"scrapperjaltup/source"
 )
 
 type Matcher struct {
 	db     _db.Database
-	source sources.Source
+	source source.Source
 }
 
-func New(db _db.Database, source sources.Source) *Matcher {
+func New(db _db.Database, source source.Source) *Matcher {
 	return &Matcher{
 		db:     db,
 		source: source,

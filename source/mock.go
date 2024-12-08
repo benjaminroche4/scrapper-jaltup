@@ -1,5 +1,5 @@
 // nolint: misspell
-package sources
+package source
 
 import (
 	"scrapperjaltup/model"

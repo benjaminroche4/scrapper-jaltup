@@ -2,7 +2,7 @@ package main
 
 import (
 	"scrapperjaltup/matcher"
-	"scrapperjaltup/sources"
+	"scrapperjaltup/source"
 
 	"github.com/urfave/cli/v2"
 )
@@ -14,7 +14,7 @@ func sourceLba(c *cli.Context) error {
 	}
 	defer db.Close()
 
-	source := sources.NewLBA()
+	source := source.NewLBA()
 
 	m := matcher.New(db, source)
 
