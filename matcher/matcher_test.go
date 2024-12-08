@@ -68,6 +68,32 @@ func TestErrorRetrieveOffers(t *testing.T) {
 	source.AssertNumberOfCalls(t, "RetrieveCategories", 1)
 }
 
+func TestErrorRetrieveCategories(t *testing.T) {
+	t.Parallel()
+
+	db, source := prepare()
+
+	source.On("RetrieveCategories").Unset()
+	source.On("RetrieveCategories").Return([]model.Category{}, errors.New("failed to fetch offers"))
+
+	m := matcher.New(db, source)
+	err := m.Execute()
+
+	assert.Error(t, err)
+
+	db.AssertNumberOfCalls(t, "SelectCategories", 1)
+	db.AssertNumberOfCalls(t, "InsertCategories", 0)
+
+	db.AssertNumberOfCalls(t, "SelectCompanies", 0)
+	db.AssertNumberOfCalls(t, "InsertCompanies", 0)
+
+	db.AssertNumberOfCalls(t, "SelectOffers", 0)
+	db.AssertNumberOfCalls(t, "InsertOffers", 0)
+
+	source.AssertNumberOfCalls(t, "RetrieveOffers", 0)
+	source.AssertNumberOfCalls(t, "RetrieveCategories", 1)
+}
+
 // Test Error on SelectCategories.
 func TestErrorSelectCategories(t *testing.T) {
 	t.Parallel()

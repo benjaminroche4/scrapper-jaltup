@@ -54,10 +54,10 @@ func (thiz *LBA) RetrieveOffers() ([]*model.Offer, error) {
 	return offers, nil
 }
 
-func (thiz *LBA) RetrieveCategories() []model.Category {
+func (thiz *LBA) RetrieveCategories() ([]model.Category, error) {
 	tags := lba.GetAllRomeTags()
 
-	return transformTagsInCategories(tags)
+	return transformTagsInCategories(tags), nil
 }
 
 // Unexported function

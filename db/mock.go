@@ -57,7 +57,7 @@ var companies = []model.Company{
 	},
 	{
 		ID:           1,
-		PublicID:     "EW9AD5CDK0",
+		PublicID:     "1ZQ46IFEPT",
 		Name:         "Coca-Cola",
 		Siret:        "3344556677",
 		ContactEmail: "contact@coca-cola.fr",

@@ -17,10 +17,12 @@ func clean(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	err = db.CleanCompanies()
 	if err != nil {
 		return err
 	}
+
 	err = db.CleanCategories()
 	if err != nil {
 		return err

@@ -100,8 +100,10 @@ func (thiz *Matcher) syncCategories() error {
 	if err != nil {
 		return err
 	}
-	categories := thiz.source.RetrieveCategories()
-
+	categories, err := thiz.source.RetrieveCategories()
+	if err != nil {
+		return err
+	}
 	newCategories := []model.Category{}
 	for _, category := range categories {
 		if ok, _ := isCategoryInList(&category, existing); ok {

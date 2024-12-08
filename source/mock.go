@@ -155,7 +155,7 @@ func NewMock() Source {
 	m := &Mock{}
 
 	m.On("RetrieveOffers").Return(offers, nil)
-	m.On("RetrieveCategories").Return(categories)
+	m.On("RetrieveCategories").Return(categories, nil)
 
 	return m
 }
@@ -165,7 +165,7 @@ func (thiz *Mock) RetrieveOffers() ([]*model.Offer, error) {
 	return args.Get(0).([]*model.Offer), args.Error(1)
 }
 
-func (thiz *Mock) RetrieveCategories() []model.Category {
+func (thiz *Mock) RetrieveCategories() ([]model.Category, error) {
 	args := thiz.Called()
-	return args.Get(0).([]model.Category)
+	return args.Get(0).([]model.Category), args.Error(1)
 }
