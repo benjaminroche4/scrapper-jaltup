@@ -7,41 +7,38 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
-	"github.com/liamg/loading/pkg/bar"
 )
 
 type LBA struct {
-	api   *lba.LaBonneAlternance
-	romes []string
+	api           *lba.LaBonneAlternance
+	romes         []string
+	sleepDuration time.Duration
 }
 
 func NewLBA() Source {
 	return &LBA{
-		api:   lba.New(),
-		romes: lba.GetRomeCodes(),
+		api:           lba.New(),
+		romes:         lba.GetRomeCodes(),
+		sleepDuration: 250 * time.Millisecond,
 	}
 }
 
-func (thiz *LBA) RetrieveOffers() ([]*model.Offer, error) {
+func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error) {
 	offers := []*model.Offer{}
 
-	loadingBar := bar.New(
-		bar.OptionHideOnFinish(true),
-	)
-	loadingBar.SetTotal(len(thiz.romes))
-	loadingBar.SetLabel("progress")
-
 	for i, rome := range thiz.romes {
-		loadingBar.SetCurrent(i)
+		if setProgression != nil {
+			setProgression(i * 100 / len(thiz.romes))
+		}
 
 		tags := lba.GetRomeTags(rome)
-		categories := transformTagsInCategories(tags)
+		categories := transformTagsInCategories(tags, nil)
 
 		resp, err := thiz.api.JobFormations([]string{rome})
 		if err != nil {
 			return offers, err
 		}
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(thiz.sleepDuration)
 
 		for i := range resp.Jobs.PeJobs.Results {
 			peJob := resp.Jobs.PeJobs.Results[i]
@@ -54,18 +51,21 @@ func (thiz *LBA) RetrieveOffers() ([]*model.Offer, error) {
 	return offers, nil
 }
 
-func (thiz *LBA) RetrieveCategories() ([]model.Category, error) {
+func (thiz *LBA) RetrieveCategories(setProgression func(int)) ([]model.Category, error) {
 	tags := lba.GetAllRomeTags()
 
-	return transformTagsInCategories(tags), nil
+	return transformTagsInCategories(tags, setProgression), nil
 }
 
 // Unexported function
 
-func transformTagsInCategories(tags []string) []model.Category {
+func transformTagsInCategories(tags []string, setProgression func(int)) []model.Category {
 	categories := []model.Category{}
 
-	for _, tag := range tags {
+	for i, tag := range tags {
+		if setProgression != nil {
+			setProgression(i * 100 / len(tags))
+		}
 		categories = append(categories, model.Category{
 			ID:       0,
 			PublicID: util.GenerateUniqueID(10),

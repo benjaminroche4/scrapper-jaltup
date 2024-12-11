@@ -1,7 +1,6 @@
 package labonnealternance
 
 import (
-	"regexp"
 	"scrapperjaltup/model"
 	"scrapperjaltup/util"
 	"strconv"
@@ -14,36 +13,6 @@ import (
 	"github.com/gosimple/slug"
 )
 
-func cleanCity(in string) string {
-	parts := strings.Split(in, "-")
-	c := cases.Title(language.French)
-	r := regexp.MustCompile("^[^0-9]+$")
-
-	for _, part := range parts {
-		field := strings.TrimSpace(part)
-
-		if r.MatchString(field) {
-			return c.String(field)
-		}
-	}
-
-	return c.String(in)
-}
-
-func cleanEmail(in string) string {
-	r := regexp.MustCompile(`[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}`)
-
-	return r.FindString(in)
-}
-
-func cleanURL(in string) string {
-	r := regexp.MustCompile(
-		`(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|\/|\/\/)?[A-z0-9_-]*?[:]?[A-z0-9_-]*?[@]?[A-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?`, // nolint: lll
-	)
-
-	return r.FindString(in)
-}
-
 func TranslatePlace(in *Place) *model.Place {
 	address := in.Address
 	if address == "" {
@@ -52,7 +21,7 @@ func TranslatePlace(in *Place) *model.Place {
 
 	return &model.Place{
 		FullAddress: address,
-		City:        cleanCity(in.City),
+		City:        util.CleanCityName(in.City),
 		ZipCode:     in.ZipCode,
 		Latitude:    in.Latitude,
 		Longitude:   in.Longitude,
@@ -91,14 +60,16 @@ func TranslateCompany(in *PeJob) *model.Company {
 	if name == "" {
 		name = "<Vide>"
 	}
+	email := util.Truncate(util.CleanEmail(strings.TrimSpace(in.Contact.Email)), 120)
+	phone := util.Truncate(strings.TrimSpace(in.Contact.Phone), 20)
 	siret := strings.TrimSpace(in.Company.Siret)
 
 	company.PublicID = util.GenerateUniqueID(10)
-	company.Name = c.String(name)
+	company.Name = util.Truncate(c.String(name), 120)
 	company.Siret = siret
-	company.ContactEmail = cleanEmail(strings.TrimSpace(in.Contact.Email))
-	company.PhoneNumber = strings.TrimSpace(in.Contact.Phone)
-	company.WebSiteURL = cleanURL(in.Company.URL)
+	company.ContactEmail = email
+	company.PhoneNumber = phone
+	company.WebSiteURL = util.Truncate(util.CleanURL(in.Company.URL), 255)
 	company.Logo = in.Company.Logo
 	company.CreatedAt = createdAt
 	company.Slug = slug.Make(name)
@@ -114,8 +85,9 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	if err != nil {
 		createdAt = time.Now().Truncate(24 * time.Hour)
 	}
-	title := strings.TrimSpace(in.Title)
-	url := strings.TrimSpace(in.URL)
+	title := util.Truncate(strings.TrimSpace(in.Title), 120)
+	url := util.Truncate(strings.TrimSpace(in.URL), 255)
+	slug := slug.Make(title)
 
 	offer.ServiceName = "la-bonne-alternance"
 	offer.ExternalID = in.ID
@@ -123,11 +95,11 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	offer.Title = title
 	offer.Place = *TranslatePlace(&in.Place)
 	offer.Job = *TranslateJob(in)
-	offer.URL = cleanURL(url)
+	offer.URL = util.CleanURL(url)
 	offer.Status = "published"
 	offer.CreatedAt = createdAt
 	offer.EndAt = createdAt.AddDate(0, 3, 0)
-	offer.Slug = slug.Make(title)
+	offer.Slug = slug
 	offer.Premium = false
 	offer.Company = *TranslateCompany(in)
 

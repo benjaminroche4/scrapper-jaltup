@@ -137,10 +137,18 @@ var offers = []model.Offer{
 
 type Mock struct {
 	mock.Mock
+
+	Categories []model.Category
+	Companies  []model.Company
+	Offers     []model.Offer
 }
 
 func NewMock() Database {
-	m := &Mock{}
+	m := &Mock{
+		Categories: categories,
+		Companies:  companies,
+		Offers:     offers,
+	}
 
 	m.On("Open").Return(nil)
 	m.On("Close").Return(nil)
@@ -189,8 +197,9 @@ func (thiz *Mock) SelectCategories() ([]model.Category, error) {
 	return args.Get(0).([]model.Category), args.Error(1)
 }
 
-func (thiz *Mock) InsertCategories(categories []model.Category) error {
-	args := thiz.Called(categories)
+func (thiz *Mock) InsertCategories(newCategories []model.Category) error {
+	thiz.Categories = append(thiz.Categories, newCategories...)
+	args := thiz.Called(newCategories)
 	return args.Error(0)
 }
 
@@ -209,8 +218,9 @@ func (thiz *Mock) SelectCompanies() ([]model.Company, error) {
 	return args.Get(0).([]model.Company), args.Error(1)
 }
 
-func (thiz *Mock) InsertCompanies(companies []model.Company) error {
-	args := thiz.Called(companies)
+func (thiz *Mock) InsertCompanies(newCompanies []model.Company) error {
+	thiz.Companies = append(thiz.Companies, newCompanies...)
+	args := thiz.Called(newCompanies)
 	return args.Error(0)
 }
 
@@ -229,8 +239,9 @@ func (thiz *Mock) SelectOffers() ([]model.Offer, error) {
 	return args.Get(0).([]model.Offer), args.Error(1)
 }
 
-func (thiz *Mock) InsertOffers(offers []model.Offer) error {
-	args := thiz.Called(offers)
+func (thiz *Mock) InsertOffers(newOffers []model.Offer) error {
+	thiz.Offers = append(thiz.Offers, newOffers...)
+	args := thiz.Called(newOffers)
 	return args.Error(0)
 }
 

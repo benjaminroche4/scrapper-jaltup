@@ -160,12 +160,12 @@ func NewMock() Source {
 	return m
 }
 
-func (thiz *Mock) RetrieveOffers() ([]*model.Offer, error) {
+func (thiz *Mock) RetrieveOffers(func(int)) ([]*model.Offer, error) {
 	args := thiz.Called()
 	return args.Get(0).([]*model.Offer), args.Error(1)
 }
 
-func (thiz *Mock) RetrieveCategories() ([]model.Category, error) {
+func (thiz *Mock) RetrieveCategories(func(int)) ([]model.Category, error) {
 	args := thiz.Called()
 	return args.Get(0).([]model.Category), args.Error(1)
 }

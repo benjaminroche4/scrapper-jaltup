@@ -3,6 +3,6 @@ package source
 import "scrapperjaltup/model"
 
 type Source interface {
-	RetrieveOffers() ([]*model.Offer, error)
-	RetrieveCategories() ([]model.Category, error)
+	RetrieveOffers(func(int)) ([]*model.Offer, error)
+	RetrieveCategories(func(int)) ([]model.Category, error)
 }

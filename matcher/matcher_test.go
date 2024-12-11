@@ -28,6 +28,9 @@ func TestMatcher(t *testing.T) {
 	err := m.Execute()
 	assert.NoError(t, err)
 
+	assert.Len(t, db.Companies, 3)
+	assert.Len(t, db.Offers, 3)
+
 	db.AssertNumberOfCalls(t, "SelectCategories", 2)
 	db.AssertNumberOfCalls(t, "InsertCategories", 1)
 
@@ -55,6 +58,9 @@ func TestErrorRetrieveOffers(t *testing.T) {
 
 	assert.Error(t, err)
 
+	assert.Len(t, db.Companies, 2)
+	assert.Len(t, db.Offers, 2)
+
 	db.AssertNumberOfCalls(t, "SelectCategories", 2)
 	db.AssertNumberOfCalls(t, "InsertCategories", 1)
 
@@ -80,6 +86,9 @@ func TestErrorRetrieveCategories(t *testing.T) {
 	err := m.Execute()
 
 	assert.Error(t, err)
+
+	assert.Len(t, db.Companies, 2)
+	assert.Len(t, db.Offers, 2)
 
 	db.AssertNumberOfCalls(t, "SelectCategories", 1)
 	db.AssertNumberOfCalls(t, "InsertCategories", 0)
@@ -108,6 +117,9 @@ func TestErrorSelectCategories(t *testing.T) {
 
 	assert.Error(t, err)
 
+	assert.Len(t, db.Companies, 2)
+	assert.Len(t, db.Offers, 2)
+
 	db.AssertNumberOfCalls(t, "SelectCategories", 1)
 	db.AssertNumberOfCalls(t, "InsertCategories", 0)
 
@@ -135,6 +147,9 @@ func TestErrorSelectCompanies(t *testing.T) {
 
 	assert.Error(t, err)
 
+	assert.Len(t, db.Companies, 2)
+	assert.Len(t, db.Offers, 2)
+
 	db.AssertNumberOfCalls(t, "SelectCategories", 2)
 	db.AssertNumberOfCalls(t, "InsertCategories", 1)
 
@@ -161,6 +176,9 @@ func TestErrorSelectOffers(t *testing.T) {
 	err := m.Execute()
 
 	assert.Error(t, err)
+
+	assert.Len(t, db.Companies, 2)
+	assert.Len(t, db.Offers, 2)
 
 	db.AssertNumberOfCalls(t, "SelectCategories", 2)
 	db.AssertNumberOfCalls(t, "InsertCategories", 1)

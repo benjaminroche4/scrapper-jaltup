@@ -5,6 +5,8 @@ import (
 	_db "scrapperjaltup/db"
 	"scrapperjaltup/model"
 	"scrapperjaltup/source"
+
+	"github.com/liamg/loading/pkg/bar"
 )
 
 type Matcher struct {
@@ -48,10 +50,12 @@ func (thiz *Matcher) Execute() error {
 
 	log.Printf("[Matcher]: Retrieved from db %d existing offers\n", len(existing))
 
-	offers, err := thiz.source.RetrieveOffers()
+	finish, setProgression := loadingBar()
+	offers, err := thiz.source.RetrieveOffers(setProgression)
 	if err != nil {
 		return err
 	}
+	finish()
 
 	log.Printf("[Matcher]: Fetched from source %d offers\n", len(offers))
 
@@ -100,10 +104,14 @@ func (thiz *Matcher) syncCategories() error {
 	if err != nil {
 		return err
 	}
-	categories, err := thiz.source.RetrieveCategories()
+
+	finish, setProgression := loadingBar()
+	categories, err := thiz.source.RetrieveCategories(setProgression)
 	if err != nil {
 		return err
 	}
+	finish()
+
 	newCategories := []model.Category{}
 	for _, category := range categories {
 		if ok, _ := isCategoryInList(&category, existing); ok {
@@ -152,4 +160,19 @@ func isCategoryInList(category *model.Category, list []model.Category) (bool, *m
 	}
 
 	return false, nil
+}
+
+func loadingBar() (func(), func(int)) {
+	loadingBar := bar.New(
+		bar.OptionHideOnFinish(true),
+	)
+	loadingBar.SetTotal(100)
+	loadingBar.SetLabel("Fetching")
+	loadingBar.SetCurrent(0)
+
+	return func() {
+			loadingBar.Finish()
+		}, func(p int) {
+			loadingBar.SetCurrent(p)
+		}
 }
