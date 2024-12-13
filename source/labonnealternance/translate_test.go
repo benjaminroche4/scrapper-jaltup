@@ -56,7 +56,7 @@ var peJob = &labonnealternance.PeJob{
 		Description:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 		EmployeurDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 		CreationDate:         "2024-11-13T14:07:42.585Z",
-		ContractType:         "CDD",
+		ContractType:         "cdd",
 		ContractDescription:  "CDD - 24 Mois",
 		Duration:             "35H",
 		JobStartDate:         "2025-01-02T00:00:00.000Z",
@@ -113,7 +113,7 @@ func TestTranslateOffer(t *testing.T) {
 			Verified:     false,
 		},
 		PublicID: "",
-		Title:    "Salarié agricole (H/F)",
+		Title:    "salarié agricole",
 		Place: model.Place{
 			FullAddress: "77 - HERME 77114",
 			City:        "Herme",

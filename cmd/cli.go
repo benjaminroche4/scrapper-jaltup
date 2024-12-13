@@ -67,6 +67,7 @@ func parseCLI() error {
 
 	cliapp.Commands = []*cli.Command{
 		cmdSourceLba(cliapp.Flags),
+		cmdSourceAltPro(cliapp.Flags),
 		cmdCount(cliapp.Flags),
 		cmdSelectCategories(cliapp.Flags),
 		cmdSelectCompanies(cliapp.Flags),
@@ -88,7 +89,17 @@ func cmdSourceLba(flags []cli.Flag) *cli.Command {
 		Name:      "lba",
 		Usage:     "fetch all offers from 'la bonne alternance' source",
 		UsageText: "scrapper lba <options>",
-		Action:    sourceLba,
+		Action:    source,
+		Flags:     flags,
+	}
+}
+
+func cmdSourceAltPro(flags []cli.Flag) *cli.Command {
+	return &cli.Command{
+		Name:      "altpro",
+		Usage:     "fetch all offers from 'alternance professionnelle' source",
+		UsageText: "scrapper altpro <options>",
+		Action:    source,
 		Flags:     flags,
 	}
 }

@@ -13,6 +13,8 @@ var (
 	URLRegEx   = regexp.MustCompile(
 		`(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|\/|\/\/)?[A-z0-9_-]*?[:]?[A-z0-9_-]*?[@]?[A-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?`, // nolint: lll
 	)
+	titleRegEx1 = regexp.MustCompile(`\s*(\()?\s*[HhFf]\s*[\/_-]\s*[HhFf]\s*(\))?`)
+	titleRegEx2 = regexp.MustCompile(`(?i)\s*(-)?\s*(en\s+)?(en\s+contrat\s+d'\s*)?(alternance|apprentissage)\s*(-)?`)
 )
 
 func Truncate(in string, maxlen int) string {
@@ -21,6 +23,16 @@ func Truncate(in string, maxlen int) string {
 	}
 
 	return in
+}
+
+func CleanTitle(in string) string {
+	out := titleRegEx1.ReplaceAllString(in, "")
+	out = titleRegEx2.ReplaceAllString(out, "")
+	out = strings.Trim(out, "/")
+	out = strings.TrimSpace(out)
+	out = strings.ToLower(out)
+
+	return out
 }
 
 func CleanCityName(in string) string {
