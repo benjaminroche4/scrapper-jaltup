@@ -1,4 +1,4 @@
-package labonnealternance
+package alternancepro
 
 import (
 	"fmt"

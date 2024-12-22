@@ -1,7 +1,9 @@
 package matcher
 
 import (
+	"crypto/rand"
 	"log"
+	"math/big"
 	_db "scrapperjaltup/db"
 	"scrapperjaltup/model"
 	"scrapperjaltup/source"
@@ -87,7 +89,7 @@ func (thiz *Matcher) Execute() error {
 		newOffers = append(newOffers, *offer)
 	}
 
-	err = thiz.db.InsertOffers(newOffers)
+	err = thiz.db.InsertOffers(shuffleOffers(newOffers))
 	if err != nil {
 		return err
 	}
@@ -175,4 +177,19 @@ func loadingBar() (func(), func(int)) {
 		}, func(p int) {
 			loadingBar.SetCurrent(p)
 		}
+}
+
+func shuffleOffers(offers []model.Offer) []model.Offer {
+	output := []model.Offer{}
+
+	for {
+		if len(offers) == 0 {
+			return output
+		}
+		maximum := big.NewInt(int64(len(offers)))
+		random, _ := rand.Int(rand.Reader, maximum)
+		index := random.Int64()
+		output = append(output, offers[index])
+		offers = append(offers[:index], offers[index+1:]...)
+	}
 }

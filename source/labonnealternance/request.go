@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -23,10 +22,8 @@ const (
 
 // LaBonneAlternance represents Client connection API.
 type LaBonneAlternance struct {
-	recvWindow int64
-	timeout    time.Duration
-	client     *http.Client
-	mutex      *sync.Mutex
+	timeout time.Duration
+	client  *http.Client
 }
 
 // New creates a new API client.
@@ -37,10 +34,8 @@ func New() *LaBonneAlternance {
 // NewWithClient creates a new API client with a specific http client.
 func NewWithClient(httpClient *http.Client) *LaBonneAlternance {
 	return &LaBonneAlternance{
-		recvWindow: 5000,
-		timeout:    httpClient.Timeout,
-		client:     httpClient,
-		mutex:      &sync.Mutex{},
+		timeout: httpClient.Timeout,
+		client:  httpClient,
 	}
 }
 

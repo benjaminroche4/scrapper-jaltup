@@ -10,7 +10,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/gosimple/slug"
+	_slug "github.com/gosimple/slug"
 )
 
 func TranslatePlace(in *Place) *model.Place {
@@ -40,7 +40,7 @@ func TranslateJob(in *PeJob) *model.Job {
 
 	return &model.Job{
 		Description:  in.Job.Description,
-		ContractType: in.Job.ContractType,
+		ContractType: strings.ToUpper(in.Job.ContractType),
 		Duration:     int16(duration),
 		Remote:       in.Place.RemoteOnly,
 		StudyLevel:   "",
@@ -72,7 +72,7 @@ func TranslateCompany(in *PeJob) *model.Company {
 	company.WebSiteURL = util.Truncate(util.CleanURL(in.Company.URL), 255)
 	company.Logo = in.Company.Logo
 	company.CreatedAt = createdAt
-	company.Slug = slug.Make(name)
+	company.Slug = _slug.Make(name)
 	company.Verified = false
 
 	return company
@@ -87,12 +87,12 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	}
 	title := util.Truncate(strings.TrimSpace(in.Title), 120)
 	url := util.Truncate(strings.TrimSpace(in.URL), 255)
-	slug := slug.Make(title)
+	slug := _slug.Make(title)
 
 	offer.ServiceName = "la-bonne-alternance"
 	offer.ExternalID = in.ID
 	offer.PublicID = util.GenerateUniqueID(10)
-	offer.Title = title
+	offer.Title = util.CleanTitle(title)
 	offer.Place = *TranslatePlace(&in.Place)
 	offer.Job = *TranslateJob(in)
 	offer.URL = util.CleanURL(url)
