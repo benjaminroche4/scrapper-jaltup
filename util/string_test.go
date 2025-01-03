@@ -47,6 +47,10 @@ func TestCleanTitle(t *testing.T) {
 		{"Manager d’unité marchande ( H / F ) en Apprentissage", "manager d’unité marchande"},
 		{"MANAGER D’UNITE MARCHANDE", "manager d’unite marchande"},
 		{"Offre poste secrétaire dentaire en contrat d'alternance", "offre poste secrétaire dentaire"},
+		{"Bac+2 - Chargé de Clientèle Secteur SAP", "chargé de clientèle secteur sap"},
+		{"BAC +5 Chargé de Clientèle Secteur SAP", "chargé de clientèle secteur sap"},
+		{"Chargé de Clientèle Secteur SAP - bac+3 ", "chargé de clientèle secteur sap"},
+		{"commercial sédentaire - (bac +1 a 5)", "commercial sédentaire"},
 	}
 
 	for _, test := range tests {
