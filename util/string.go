@@ -38,13 +38,14 @@ func CleanTitle(in string) string {
 func CleanCityName(in string) string {
 	parts := strings.Split(in, "-")
 	c := cases.Title(language.French)
-	r := regexp.MustCompile("^[^0-9]+$")
+	r := regexp.MustCompile(`[^0-9]{2,}`)
 
 	for _, part := range parts {
 		field := strings.TrimSpace(part)
 
-		if r.MatchString(field) {
-			return c.String(field)
+		str := r.FindString(field)
+		if str != "" {
+			return c.String(strings.TrimSpace(str))
 		}
 	}
 
