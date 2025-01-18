@@ -13,6 +13,8 @@ import (
 	_slug "github.com/gosimple/slug"
 )
 
+const ValidDuration = 30 * 24 * time.Hour
+
 func TranslatePlace(in *Place) *model.Place {
 	address := in.Address
 	if address == "" {
@@ -98,7 +100,7 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	offer.URL = util.CleanURL(url)
 	offer.Status = "published"
 	offer.CreatedAt = createdAt
-	offer.EndAt = createdAt.AddDate(0, 3, 0)
+	offer.EndAt = createdAt.Add(ValidDuration)
 	offer.Slug = slug
 	offer.Premium = false
 	offer.Company = *TranslateCompany(in)

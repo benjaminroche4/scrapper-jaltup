@@ -24,6 +24,8 @@ const (
 	APIURL = "https://www.alternance-professionnelle.fr"
 	// APIUserAgent identifies this library with the API.
 	APIUserAgent = "Jaltup"
+
+	ValidDuration = 30 * 24 * time.Hour
 )
 
 // AlternancePro represents Client connection API.
@@ -358,7 +360,7 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 		Tag:         []string{},
 		Status:      "published",
 		CreatedAt:   createdAt,
-		EndAt:       createdAt.AddDate(0, 3, 0),
+		EndAt:       createdAt.Add(ValidDuration),
 		Slug:        _slug.Make(title),
 		Premium:     false,
 		ExternalID:  util.Truncate(slug, 255),
