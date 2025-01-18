@@ -14,6 +14,7 @@ func TestCleanCityName(t *testing.T) {
 		input  string
 		expect string
 	}{
+		{"Bourg-en-Bresse", "Bourg-En-Bresse"},
 		{"VIC EN BIGORRE", "Vic En Bigorre"},
 		{"89 - ST FARGEAU 89170", "St Fargeau"},
 		{"75 - PARIS 09 75009", "Paris"},
