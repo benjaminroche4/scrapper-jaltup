@@ -44,7 +44,9 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 			peJob := resp.Jobs.PeJobs.Results[i]
 			offer := lba.TranslateOffer(&peJob)
 			offer.Categories = categories
-			offers = append(offers, offer)
+			if !isOfferInList(offer, offers) {
+				offers = append(offers, offer)
+			}
 		}
 	}
 
@@ -75,4 +77,14 @@ func transformTagsInCategories(tags []string, setProgression func(int)) []model.
 	}
 
 	return categories
+}
+
+func isOfferInList(offer *model.Offer, list []*model.Offer) bool {
+	for i := range list {
+		if model.IsSame(offer, list[i]) {
+			return true
+		}
+	}
+
+	return false
 }

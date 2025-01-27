@@ -65,7 +65,7 @@ func (thiz *Matcher) Execute() error {
 	for i := range offers {
 		offer := offers[i]
 
-		if ok, _ := isOfferInList(offer, existing); ok {
+		if isOfferInList(offer, existing) {
 			continue
 		}
 
@@ -132,15 +132,14 @@ func (thiz *Matcher) syncCategories() error {
 	return nil
 }
 
-func isOfferInList(offer *model.Offer, list []model.Offer) (bool, *model.Offer) {
+func isOfferInList(offer *model.Offer, list []model.Offer) bool {
 	for i := range list {
-		if (offer.ServiceName == list[i].ServiceName) &&
-			(offer.ExternalID == list[i].ExternalID) {
-			return true, &list[i]
+		if model.IsSame(offer, &list[i]) {
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }
 
 func isCompanyInList(company *model.Company, list []model.Company) (bool, *model.Company) {
