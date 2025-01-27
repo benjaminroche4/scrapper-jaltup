@@ -114,6 +114,9 @@ func (thiz *DB) SelectOffers() ([]model.Offer, error) {
 				case "end_date":
 					offer.EndAt, _ = time.Parse("2006-01-02", string(value))
 
+				case "end_premium":
+					offer.EndPremiumAt, _ = time.Parse("2006-01-02", string(value))
+
 				case "slug":
 					offer.Slug = string(value)
 
@@ -154,11 +157,12 @@ func (thiz *DB) InsertOffers(offers []model.Offer) error {
 			"status," +
 			"created_at," +
 			"end_date," +
+			"end_premium," +
 			"slug," +
 			"premium," +
 			"external_id," +
 			"service_name" +
-			") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+			") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	ctx, cancel := context.WithTimeout(context.Background(), thiz.timeout)
 	defer cancel()
@@ -207,6 +211,7 @@ func (thiz *DB) InsertOffers(offers []model.Offer) error {
 			offer.Status,
 			offer.CreatedAt.Format(time.DateTime),
 			offer.EndAt.Format("2006-01-02"),
+			offer.EndPremiumAt.Format("2006-01-02"),
 			offer.Slug,
 			premium,
 			offer.ExternalID,

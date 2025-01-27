@@ -13,7 +13,10 @@ import (
 	_slug "github.com/gosimple/slug"
 )
 
-const ValidDuration = 30 * 24 * time.Hour
+const (
+	ValidDuration   = 30 * 24 * time.Hour
+	PremiumDuration = 7 * 24 * time.Hour
+)
 
 func TranslatePlace(in *Place) *model.Place {
 	address := in.Address
@@ -60,7 +63,7 @@ func TranslateCompany(in *PeJob) *model.Company {
 	}
 	name := strings.TrimSpace(in.Company.Name)
 	if name == "" {
-		name = "<Vide>"
+		name = "Inconnu"
 	}
 	email := util.Truncate(util.CleanEmail(strings.TrimSpace(in.Contact.Email)), 120)
 	phone := util.Truncate(strings.TrimSpace(in.Contact.Phone), 20)
@@ -90,6 +93,10 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	title := util.Truncate(strings.TrimSpace(in.Title), 120)
 	url := util.Truncate(strings.TrimSpace(in.URL), 255)
 	slug := _slug.Make(title)
+	status := "published"
+	if title == "" {
+		status = "archived"
+	}
 
 	offer.ServiceName = "la-bonne-alternance"
 	offer.ExternalID = in.ID
@@ -98,9 +105,10 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	offer.Place = *TranslatePlace(&in.Place)
 	offer.Job = *TranslateJob(in)
 	offer.URL = util.CleanURL(url)
-	offer.Status = "published"
+	offer.Status = status
 	offer.CreatedAt = createdAt
 	offer.EndAt = createdAt.Add(ValidDuration)
+	offer.EndPremiumAt = createdAt.Add(PremiumDuration)
 	offer.Slug = slug
 	offer.Premium = false
 	offer.Company = *TranslateCompany(in)
