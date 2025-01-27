@@ -1,4 +1,4 @@
-package alternancepro
+package html
 
 import (
 	"strings"
@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func nextNodeElement(node *html.Node) *html.Node {
+func NextNodeElement(node *html.Node) *html.Node {
 	next := node
 	for next != nil {
 		next = next.NextSibling
@@ -18,7 +18,7 @@ func nextNodeElement(node *html.Node) *html.Node {
 	return nil
 }
 
-func nextChildNodeElement(node *html.Node) *html.Node {
+func NextChildNodeElement(node *html.Node) *html.Node {
 	if node == nil {
 		return nil
 	}
@@ -31,7 +31,7 @@ func nextChildNodeElement(node *html.Node) *html.Node {
 	return nil
 }
 
-func findNodeByTagName(node *html.Node, name string) *html.Node {
+func FindNodeByTagName(node *html.Node, name string) *html.Node {
 	if node == nil {
 		return nil
 	}
@@ -39,7 +39,7 @@ func findNodeByTagName(node *html.Node, name string) *html.Node {
 		return node
 	}
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		found := findNodeByTagName(child, name)
+		found := FindNodeByTagName(child, name)
 		if found != nil {
 			return found
 		}
@@ -48,7 +48,7 @@ func findNodeByTagName(node *html.Node, name string) *html.Node {
 	return nil
 }
 
-func findAllNodesByTagName(node *html.Node, name string) []*html.Node {
+func FindAllNodesByTagName(node *html.Node, name string) []*html.Node {
 	nodes := []*html.Node{}
 
 	if node == nil {
@@ -60,7 +60,7 @@ func findAllNodesByTagName(node *html.Node, name string) []*html.Node {
 	}
 
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		found := findAllNodesByTagName(child, name)
+		found := FindAllNodesByTagName(child, name)
 		if len(found) > 0 {
 			nodes = append(nodes, found...)
 		}
@@ -69,7 +69,7 @@ func findAllNodesByTagName(node *html.Node, name string) []*html.Node {
 	return nodes
 }
 
-func findNodeByClassName(node *html.Node, name string) *html.Node {
+func FindNodeByClassName(node *html.Node, name string) *html.Node {
 	if node != nil {
 		if node.Type == html.ElementNode {
 			for _, a := range node.Attr {
@@ -85,7 +85,7 @@ func findNodeByClassName(node *html.Node, name string) *html.Node {
 		}
 
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			found := findNodeByClassName(child, name)
+			found := FindNodeByClassName(child, name)
 			if found != nil {
 				return found
 			}
@@ -95,7 +95,7 @@ func findNodeByClassName(node *html.Node, name string) *html.Node {
 	return nil
 }
 
-func getNodeAttr(node *html.Node, key string) (string, bool) {
+func GetNodeAttr(node *html.Node, key string) (string, bool) {
 	if node != nil {
 		for _, a := range node.Attr {
 			if a.Key == key {
@@ -106,14 +106,15 @@ func getNodeAttr(node *html.Node, key string) (string, bool) {
 	return "", false
 }
 
-func getTextContent(node *html.Node) (string, bool) {
+func GetTextContent(node *html.Node) (string, bool) {
 	if node != nil {
-		if node.Type == html.TextNode {
-			return node.Data, true
+		data := strings.TrimSpace(node.Data)
+		if node.Type == html.TextNode && data != "" {
+			return data, true
 		}
 
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			data, found := getTextContent(child)
+			data, found := GetTextContent(child)
 			if found {
 				return data, true
 			}
@@ -122,10 +123,10 @@ func getTextContent(node *html.Node) (string, bool) {
 	return "", false
 }
 
-func getNodeLink(node *html.Node) (string, bool) {
+func GetNodeLink(node *html.Node) (string, bool) {
 	if node != nil {
 		if node.Type == html.ElementNode && node.Data == "a" {
-			return getNodeAttr(node, "href")
+			return GetNodeAttr(node, "href")
 		}
 	}
 

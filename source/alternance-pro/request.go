@@ -12,6 +12,7 @@ import (
 	"scrapperjaltup/model"
 	"scrapperjaltup/util"
 	"scrapperjaltup/util/cities"
+	_html "scrapperjaltup/util/html"
 	"strconv"
 	"strings"
 	"time"
@@ -63,17 +64,17 @@ func (thiz *AlternancePro) Companies() ([]*model.Company, error) {
 		return companies, err
 	}
 
-	body := findNodeByTagName(doc, "body")
+	body := _html.FindNodeByTagName(doc, "body")
 	if body == nil {
 		return companies, errors.New("can't find body node")
 	}
-	list := findNodeByClassName(body, "mhh-entreprises")
+	list := _html.FindNodeByClassName(body, "mhh-entreprises")
 	if list == nil {
 		return companies, errors.New("can't find list node")
 	}
 	for child := list.FirstChild; child != nil; child = child.NextSibling {
 		if child.Type == html.ElementNode {
-			link, ok := getNodeLink(child)
+			link, ok := _html.GetNodeLink(child)
 			if !ok {
 				continue
 			}
@@ -109,24 +110,24 @@ func (thiz *AlternancePro) Company(slug string) (*model.Company, error) {
 	if err != nil {
 		return nil, err
 	}
-	body := findNodeByTagName(doc, "body")
+	body := _html.FindNodeByTagName(doc, "body")
 	if body == nil {
 		return nil, errors.New("can't find body node")
 	}
-	details := findNodeByClassName(body, "entreprises-profile-detail")
+	details := _html.FindNodeByClassName(body, "entreprises-profile-detail")
 	if details == nil {
 		return nil, errors.New("can't find details node")
 	}
-	title := findNodeByTagName(details, "h1")
+	title := _html.FindNodeByTagName(details, "h1")
 	if title != nil {
-		name, _ = getTextContent(title)
+		name, _ = _html.GetTextContent(title)
 		name = util.Truncate(name, 120)
 	} else {
 		return nil, errors.New("can't find details title")
 	}
-	linkNode := findNodeByClassName(details, "internet")
+	linkNode := _html.FindNodeByClassName(details, "internet")
 	if linkNode != nil {
-		href, ok := getNodeAttr(linkNode.FirstChild, "href")
+		href, ok := _html.GetNodeAttr(linkNode.FirstChild, "href")
 		if ok {
 			href = util.CleanURL(href)
 			if href != "" {
@@ -134,19 +135,19 @@ func (thiz *AlternancePro) Company(slug string) (*model.Company, error) {
 			}
 		}
 	}
-	image := findNodeByTagName(details, "img")
+	image := _html.FindNodeByTagName(details, "img")
 	if image != nil {
-		logo, _ = getNodeAttr(image, "src")
+		logo, _ = _html.GetNodeAttr(image, "src")
 		logo = util.Truncate(logo, 255)
 	}
-	emailNode := findNodeByClassName(body, "email")
+	emailNode := _html.FindNodeByClassName(body, "email")
 	if emailNode != nil {
-		email, _ = getTextContent(emailNode)
+		email, _ = _html.GetTextContent(emailNode)
 		email = util.Truncate(util.CleanEmail(email), 120)
 	}
-	phoneNode := findNodeByClassName(body, "telephone")
+	phoneNode := _html.FindNodeByClassName(body, "telephone")
 	if phoneNode != nil {
-		phone, _ = getTextContent(phoneNode)
+		phone, _ = _html.GetTextContent(phoneNode)
 		phone = util.Truncate(phone, 20)
 	}
 
@@ -197,9 +198,9 @@ func (thiz *AlternancePro) Jobs(page int, jobtype string) ([]*model.Offer, int, 
 	if err != nil {
 		return nil, 0, err
 	}
-	nodes := findAllNodesByTagName(doc, "a")
+	nodes := _html.FindAllNodesByTagName(doc, "a")
 	for _, node := range nodes {
-		link, ok := getNodeLink(node)
+		link, ok := _html.GetNodeLink(node)
 		if !ok {
 			continue
 		}
@@ -328,7 +329,7 @@ func createPlace(name string) *model.Place {
 }
 
 func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
-	body := findNodeByTagName(doc, "body")
+	body := _html.FindNodeByTagName(doc, "body")
 	if body == nil {
 		return nil, errors.New("can't find body node")
 	}
@@ -380,13 +381,13 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 func parseJobTitle(body *html.Node) (string, error) {
 	var title string
 
-	detail := findNodeByClassName(body, "entreprises-profile-detail")
+	detail := _html.FindNodeByClassName(body, "entreprises-profile-detail")
 	if detail == nil {
 		return "", errors.New("can't find detail node")
 	}
-	titleNode := findNodeByTagName(detail, "h1")
+	titleNode := _html.FindNodeByTagName(detail, "h1")
 	if titleNode != nil {
-		title, _ = getTextContent(titleNode)
+		title, _ = _html.GetTextContent(titleNode)
 		title = util.Truncate(title, 120)
 	} else {
 		return "", errors.New("can't find details title")
@@ -397,16 +398,16 @@ func parseJobTitle(body *html.Node) (string, error) {
 
 func parseJobDescription(body *html.Node) string {
 	description := ""
-	main := findNodeByClassName(body, "entreprises-main")
+	main := _html.FindNodeByClassName(body, "entreprises-main")
 	if main != nil {
-		descriptionNode := findNodeByTagName(main, "h2")
-		child := nextNodeElement(descriptionNode)
+		descriptionNode := _html.FindNodeByTagName(main, "h2")
+		child := _html.NextNodeElement(descriptionNode)
 		for child != nil {
-			text, ok := getTextContent(child)
+			text, ok := _html.GetTextContent(child)
 			if ok {
 				description += text + "\n"
 			}
-			child = nextNodeElement(child)
+			child = _html.NextNodeElement(child)
 		}
 	}
 
@@ -418,54 +419,54 @@ func parseJobDetails(body *html.Node) (*JobDetail, error) {
 		company, city, contractType, studyLevel string
 		startDate                               time.Time
 	)
-	companyNode := findNodeByClassName(body, "entreprises-sidebar")
+	companyNode := _html.FindNodeByClassName(body, "entreprises-sidebar")
 	if companyNode == nil {
 		return nil, errors.New("can't find company node")
 	}
-	child := nextChildNodeElement(companyNode)
+	child := _html.NextChildNodeElement(companyNode)
 	if child != nil {
-		child = nextChildNodeElement(child)
+		child = _html.NextChildNodeElement(child)
 	}
 	for child != nil {
-		section, _ := getTextContent(child)
+		section, _ := _html.GetTextContent(child)
 		if child.Data == "h3" {
 			section = strings.ToLower(section)
 			if strings.Contains(section, "entreprise") {
-				child = nextNodeElement(child)
+				child = _html.NextNodeElement(child)
 				if child != nil && child.Data == "p" {
-					company, _ = getTextContent(child)
+					company, _ = _html.GetTextContent(child)
 					company = util.Truncate(company, 120)
 				}
 			}
 			if strings.Contains(section, "lieu") {
-				child = nextNodeElement(child)
+				child = _html.NextNodeElement(child)
 				if child != nil && child.Data == "p" {
-					city, _ = getTextContent(child)
+					city, _ = _html.GetTextContent(child)
 				}
 			}
 			if strings.Contains(section, "date de début") {
-				child = nextNodeElement(child)
+				child = _html.NextNodeElement(child)
 				if child != nil && child.Data == "p" {
-					date, _ := getTextContent(child)
+					date, _ := _html.GetTextContent(child)
 					startDate, _ = time.Parse("02/01/2006", date)
 				}
 			}
 			if strings.Contains(section, "type de contrat") {
-				child = nextNodeElement(child)
+				child = _html.NextNodeElement(child)
 				if child != nil && child.Data == "p" {
-					contractType, _ = getTextContent(child)
+					contractType, _ = _html.GetTextContent(child)
 					contractType = strings.ToUpper(contractType)
 				}
 			}
 			if strings.Contains(section, "niveau de formation") {
-				child = nextNodeElement(child)
+				child = _html.NextNodeElement(child)
 				if child != nil && child.Data == "p" {
-					studyLevel, _ = getTextContent(child)
+					studyLevel, _ = _html.GetTextContent(child)
 					studyLevel = strings.ToUpper(studyLevel)
 				}
 			}
 		}
-		child = nextNodeElement(child)
+		child = _html.NextNodeElement(child)
 	}
 
 	return &JobDetail{
