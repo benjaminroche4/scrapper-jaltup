@@ -89,6 +89,11 @@ func (thiz *Matcher) Execute() error {
 		newOffers = append(newOffers, *offer)
 	}
 
+	err = thiz.db.InsertOffers(shuffleOffers(newOffers))
+	if err != nil {
+		return err
+	}
+
 	log.Printf("[Matcher]: Inserted %d new offers\n", len(newOffers))
 
 	return nil
