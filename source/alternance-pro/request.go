@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"scrapperjaltup/model"
 	"scrapperjaltup/util"
+	"scrapperjaltup/util/cities"
 	"strconv"
 	"strings"
 	"time"
@@ -310,7 +311,7 @@ func createPlace(name string) *model.Place {
 	zipCode := ""
 	latitude := 0.0
 	longitude := 0.0
-	city := util.FindCity(name)
+	city := cities.FindCity(name)
 	if city != nil {
 		zipCode = city.ZipCode
 		latitude = city.Latitude
@@ -343,6 +344,11 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 	company := createCompany(jobDetails.CompanyName)
 	city := util.CleanCityName(jobDetails.City)
 	createdAt := time.Now().Truncate(24 * time.Hour)
+	endPremiumAt := createdAt.Add(PremiumDuration)
+	premium := false
+	if time.Now().Unix() < endPremiumAt.Unix() {
+		premium = true
+	}
 	return &model.Offer{
 		ID:       0,
 		Company:  *company,
@@ -362,9 +368,9 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 		Status:       "published",
 		CreatedAt:    createdAt,
 		EndAt:        createdAt.Add(ValidDuration),
-		EndPremiumAt: createdAt.Add(PremiumDuration),
+		EndPremiumAt: endPremiumAt,
 		Slug:         _slug.Make(title),
-		Premium:      false,
+		Premium:      premium,
 		ExternalID:   util.Truncate(slug, 255),
 		ServiceName:  "alternance-professionnelle",
 		Categories:   []model.Category{},

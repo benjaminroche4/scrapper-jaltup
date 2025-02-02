@@ -2019,7 +2019,7 @@ func FindCity(name string) *City {
 	api := geoapi.NewWithTimeout(5 * time.Second)
 	items, err := api.SearchMunicipality(name)
 	if err == nil {
-		for _, item := range items {
+		for _, item := range items[:10] {
 			if slug == _slug.Make(item.Name) {
 				geocity, err := api.GetDetailedMunicipality(item.Code)
 				if err == nil {
