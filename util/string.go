@@ -17,6 +17,7 @@ var (
 	titleRegEx2 = regexp.MustCompile(`(?i)\s*(-)?\s*(en\s+)?(en\s+contrat\s+d'\s*)?(alternance|apprentissage)\s*(-)?`)
 	titleRegEx3 = regexp.MustCompile(`(?i)\s*([-(])?\s*(bac\s*\+[0-9]+)(\s+[aà]\s+[0-9]+)?\s*([-)])?`)
 	titleRegEx4 = regexp.MustCompile(`(?i)\s*([-(]:)?\s*(mesure\s+poei)\s*([-):])?`)
+	titleRegEx5 = regexp.MustCompile(`(?i)(mesure\s+poei|[*]{2,})\s*`)
 )
 
 func Truncate(in string, maxlen int) string {
@@ -32,6 +33,7 @@ func CleanTitle(in string) string {
 	out = titleRegEx2.ReplaceAllString(out, "")
 	out = titleRegEx3.ReplaceAllString(out, "")
 	out = titleRegEx4.ReplaceAllString(out, "")
+	out = titleRegEx5.ReplaceAllString(out, "")
 	out = strings.Trim(out, "/")
 	out = strings.Trim(out, "-")
 	out = strings.TrimSpace(out)

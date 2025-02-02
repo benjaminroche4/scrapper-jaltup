@@ -53,6 +53,7 @@ func TestCleanTitle(t *testing.T) {
 		{"Chargé de Clientèle Secteur SAP - bac+3 ", "chargé de clientèle secteur sap"},
 		{"commercial sédentaire - (bac +1 a 5)", "commercial sédentaire"},
 		{"Mesure poei: conducteur/conductrice de ligne automatisée", "conducteur/conductrice de ligne automatisée"},
+		{"Facteur/factrice *** recrutement sans cv ***", "facteur/factrice recrutement sans cv"},
 	}
 
 	for _, test := range tests {
