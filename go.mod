@@ -3,6 +3,7 @@ module scrapperjaltup
 go 1.22.0
 
 require (
+	github.com/alex-cos/geoapi v0.1.0
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/derektata/lorem v0.0.2
 	github.com/go-sql-driver/mysql v1.8.1
@@ -10,7 +11,7 @@ require (
 	github.com/gosimple/slug v1.14.0
 	github.com/jftuga/ellipsis v1.0.0
 	github.com/liamg/loading v0.0.6
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	golang.org/x/net v0.32.0
 	golang.org/x/text v0.21.0
