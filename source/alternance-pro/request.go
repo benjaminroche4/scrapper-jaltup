@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"scrapperjaltup/model"
 	"scrapperjaltup/util"
+	"scrapperjaltup/util/cities"
 	"strconv"
 	"strings"
 	"time"
@@ -25,7 +26,8 @@ const (
 	// APIUserAgent identifies this library with the API.
 	APIUserAgent = "Jaltup"
 
-	ValidDuration = 30 * 24 * time.Hour
+	ValidDuration   = 30 * 24 * time.Hour
+	PremiumDuration = 7 * 24 * time.Hour
 )
 
 // AlternancePro represents Client connection API.
@@ -309,7 +311,7 @@ func createPlace(name string) *model.Place {
 	zipCode := ""
 	latitude := 0.0
 	longitude := 0.0
-	city := util.FindCity(name)
+	city := cities.GetCityMapper().FindCity(name)
 	if city != nil {
 		zipCode = city.ZipCode
 		latitude = city.Latitude
@@ -342,6 +344,11 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 	company := createCompany(jobDetails.CompanyName)
 	city := util.CleanCityName(jobDetails.City)
 	createdAt := time.Now().Truncate(24 * time.Hour)
+	endPremiumAt := createdAt.Add(PremiumDuration)
+	premium := false
+	if time.Now().Unix() < endPremiumAt.Unix() {
+		premium = true
+	}
 	return &model.Offer{
 		ID:       0,
 		Company:  *company,
@@ -356,16 +363,17 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 			StudyLevel:   jobDetails.StudyLevel,
 			StartDate:    jobDetails.StartDate,
 		},
-		URL:         util.Truncate(req, 255),
-		Tag:         []string{},
-		Status:      "published",
-		CreatedAt:   createdAt,
-		EndAt:       createdAt.Add(ValidDuration),
-		Slug:        _slug.Make(title),
-		Premium:     false,
-		ExternalID:  util.Truncate(slug, 255),
-		ServiceName: "alternance-professionnelle",
-		Categories:  []model.Category{},
+		URL:          util.Truncate(req, 255),
+		Tag:          []string{},
+		Status:       "published",
+		CreatedAt:    createdAt,
+		EndAt:        createdAt.Add(ValidDuration),
+		EndPremiumAt: endPremiumAt,
+		Slug:         _slug.Make(title),
+		Premium:      premium,
+		ExternalID:   util.Truncate(slug, 255),
+		ServiceName:  "alternance-professionnelle",
+		Categories:   []model.Category{},
 	}, nil
 }
 

@@ -65,7 +65,7 @@ func (thiz *Matcher) Execute() error {
 	for i := range offers {
 		offer := offers[i]
 
-		if ok, _ := isOfferInList(offer, existing); ok {
+		if isOfferInList(offer, existing) {
 			continue
 		}
 
@@ -89,7 +89,7 @@ func (thiz *Matcher) Execute() error {
 		newOffers = append(newOffers, *offer)
 	}
 
-	err = thiz.db.InsertOffers(markRandomPremium(shuffleOffers(newOffers)))
+	err = thiz.db.InsertOffers(shuffleOffers(newOffers))
 	if err != nil {
 		return err
 	}
@@ -132,15 +132,14 @@ func (thiz *Matcher) syncCategories() error {
 	return nil
 }
 
-func isOfferInList(offer *model.Offer, list []model.Offer) (bool, *model.Offer) {
+func isOfferInList(offer *model.Offer, list []model.Offer) bool {
 	for i := range list {
-		if (offer.ServiceName == list[i].ServiceName) &&
-			(offer.ExternalID == list[i].ExternalID) {
-			return true, &list[i]
+		if model.IsSame(offer, &list[i]) {
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }
 
 func isCompanyInList(company *model.Company, list []model.Company) (bool, *model.Company) {
@@ -192,18 +191,4 @@ func shuffleOffers(offers []model.Offer) []model.Offer {
 		output = append(output, offers[index])
 		offers = append(offers[:index], offers[index+1:]...)
 	}
-}
-
-func markRandomPremium(offers []model.Offer) []model.Offer {
-	output := []model.Offer{}
-
-	for i := range offers {
-		random, _ := rand.Int(rand.Reader, big.NewInt(int64(100)))
-		if random.Int64() <= 10 {
-			offers[i].Premium = true
-		}
-		output = append(output, offers[i])
-	}
-
-	return output
 }

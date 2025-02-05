@@ -3,6 +3,7 @@ package labonnealternance
 import (
 	"scrapperjaltup/model"
 	"scrapperjaltup/util"
+	"scrapperjaltup/util/cities"
 	"strconv"
 	"strings"
 	"time"
@@ -10,27 +11,47 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/alex-cos/lbaapi"
 	_slug "github.com/gosimple/slug"
 )
 
-const ValidDuration = 30 * 24 * time.Hour
+const (
+	ValidDuration   = 30 * 24 * time.Hour
+	PremiumDuration = 7 * 24 * time.Hour
+)
 
-func TranslatePlace(in *Place) *model.Place {
+func TranslatePlace(in *lbaapi.Place) *model.Place {
 	address := in.Address
 	if address == "" {
 		address = in.FullAddress
 	}
+	name := util.CleanCityName(in.City)
+	city := cities.GetCityMapper().FindCity(name)
+	zipCode := in.ZipCode
+	latitude := in.Latitude
+	longitude := in.Longitude
+	if city != nil {
+		if zipCode == "" {
+			zipCode = city.ZipCode
+		}
+		if latitude == 0.0 {
+			latitude = city.Latitude
+		}
+		if longitude == 0.0 {
+			longitude = city.Longitude
+		}
+	}
 
 	return &model.Place{
 		FullAddress: address,
-		City:        util.CleanCityName(in.City),
-		ZipCode:     in.ZipCode,
-		Latitude:    in.Latitude,
-		Longitude:   in.Longitude,
+		City:        name,
+		ZipCode:     zipCode,
+		Latitude:    latitude,
+		Longitude:   longitude,
 	}
 }
 
-func TranslateJob(in *PeJob) *model.Job {
+func TranslateJob(in *lbaapi.PeJob) *model.Job {
 	duration, err := strconv.ParseInt(in.Job.Duration, 10, 16)
 	if err != nil {
 		duration = 0
@@ -50,7 +71,7 @@ func TranslateJob(in *PeJob) *model.Job {
 	}
 }
 
-func TranslateCompany(in *PeJob) *model.Company {
+func TranslateCompany(in *lbaapi.PeJob) *model.Company {
 	c := cases.Title(language.French)
 	company := &model.Company{}
 
@@ -60,7 +81,7 @@ func TranslateCompany(in *PeJob) *model.Company {
 	}
 	name := strings.TrimSpace(in.Company.Name)
 	if name == "" {
-		name = "<Vide>"
+		name = "Inconnu"
 	}
 	email := util.Truncate(util.CleanEmail(strings.TrimSpace(in.Contact.Email)), 120)
 	phone := util.Truncate(strings.TrimSpace(in.Contact.Phone), 20)
@@ -80,16 +101,21 @@ func TranslateCompany(in *PeJob) *model.Company {
 	return company
 }
 
-func TranslateOffer(in *PeJob) *model.Offer {
+func TranslateOffer(in *lbaapi.PeJob) *model.Offer {
 	var offer model.Offer
 
 	createdAt, err := time.Parse(time.RFC3339, in.Job.CreationDate)
 	if err != nil {
 		createdAt = time.Now().Truncate(24 * time.Hour)
 	}
+	endPremiumAt := createdAt.Add(PremiumDuration)
 	title := util.Truncate(strings.TrimSpace(in.Title), 120)
 	url := util.Truncate(strings.TrimSpace(in.URL), 255)
 	slug := _slug.Make(title)
+	status := "published"
+	if len(title) < 3 {
+		status = "archived"
+	}
 
 	offer.ServiceName = "la-bonne-alternance"
 	offer.ExternalID = in.ID
@@ -98,11 +124,15 @@ func TranslateOffer(in *PeJob) *model.Offer {
 	offer.Place = *TranslatePlace(&in.Place)
 	offer.Job = *TranslateJob(in)
 	offer.URL = util.CleanURL(url)
-	offer.Status = "published"
+	offer.Status = status
 	offer.CreatedAt = createdAt
 	offer.EndAt = createdAt.Add(ValidDuration)
+	offer.EndPremiumAt = endPremiumAt
 	offer.Slug = slug
 	offer.Premium = false
+	if time.Now().Unix() < endPremiumAt.Unix() {
+		offer.Premium = true
+	}
 	offer.Company = *TranslateCompany(in)
 
 	return &offer

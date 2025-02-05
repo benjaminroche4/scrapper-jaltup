@@ -1,4 +1,4 @@
-package labonnealternance
+package util
 
 // nolint: misspell
 var romes = map[string][]string{

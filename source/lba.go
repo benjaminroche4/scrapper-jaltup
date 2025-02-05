@@ -6,19 +6,20 @@ import (
 	"scrapperjaltup/util"
 	"time"
 
+	"github.com/alex-cos/lbaapi"
 	"github.com/gosimple/slug"
 )
 
 type LBA struct {
-	api           *lba.LaBonneAlternance
+	api           *lbaapi.LaBonneAlternance
 	romes         []string
 	sleepDuration time.Duration
 }
 
 func NewLBA() Source {
 	return &LBA{
-		api:           lba.New(),
-		romes:         lba.GetRomeCodes(),
+		api:           lbaapi.New("contact@a26k.ch"),
+		romes:         util.GetRomeCodes(),
 		sleepDuration: 250 * time.Millisecond,
 	}
 }
@@ -31,7 +32,7 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 			setProgression(i * 100 / len(thiz.romes))
 		}
 
-		tags := lba.GetRomeTags(rome)
+		tags := util.GetRomeTags(rome)
 		categories := transformTagsInCategories(tags, nil)
 
 		resp, err := thiz.api.JobFormations([]string{rome})
@@ -44,7 +45,9 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 			peJob := resp.Jobs.PeJobs.Results[i]
 			offer := lba.TranslateOffer(&peJob)
 			offer.Categories = categories
-			offers = append(offers, offer)
+			if !isOfferInList(offer, offers) {
+				offers = append(offers, offer)
+			}
 		}
 	}
 
@@ -52,7 +55,7 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 }
 
 func (thiz *LBA) RetrieveCategories(setProgression func(int)) ([]model.Category, error) {
-	tags := lba.GetAllRomeTags()
+	tags := util.GetAllRomeTags()
 
 	return transformTagsInCategories(tags, setProgression), nil
 }
@@ -75,4 +78,14 @@ func transformTagsInCategories(tags []string, setProgression func(int)) []model.
 	}
 
 	return categories
+}
+
+func isOfferInList(offer *model.Offer, list []*model.Offer) bool {
+	for i := range list {
+		if model.IsSame(offer, list[i]) {
+			return true
+		}
+	}
+
+	return false
 }
