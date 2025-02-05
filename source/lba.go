@@ -19,7 +19,7 @@ type LBA struct {
 func NewLBA() Source {
 	return &LBA{
 		api:           lbaapi.New("contact@a26k.ch"),
-		romes:         lba.GetRomeCodes(),
+		romes:         util.GetRomeCodes(),
 		sleepDuration: 250 * time.Millisecond,
 	}
 }
@@ -32,7 +32,7 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 			setProgression(i * 100 / len(thiz.romes))
 		}
 
-		tags := lba.GetRomeTags(rome)
+		tags := util.GetRomeTags(rome)
 		categories := transformTagsInCategories(tags, nil)
 
 		resp, err := thiz.api.JobFormations([]string{rome})
@@ -55,7 +55,7 @@ func (thiz *LBA) RetrieveOffers(setProgression func(int)) ([]*model.Offer, error
 }
 
 func (thiz *LBA) RetrieveCategories(setProgression func(int)) ([]model.Category, error) {
-	tags := lba.GetAllRomeTags()
+	tags := util.GetAllRomeTags()
 
 	return transformTagsInCategories(tags, setProgression), nil
 }
