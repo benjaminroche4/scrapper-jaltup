@@ -6,23 +6,24 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alex-cos/lbaapi"
 	"github.com/stretchr/testify/assert"
 )
 
-var peJob = &labonnealternance.PeJob{
+var peJob = &lbaapi.PeJob{
 	ID:            "184BFDV",
 	Title:         "Salarié agricole (H/F)",
 	IdeaType:      "peJob",
 	URL:           "https://candidat.francetravail.fr/offres/recherche/detail/184BFDV",
 	DetailsLoaded: false,
-	Contact: labonnealternance.Contact{
+	Contact: lbaapi.Contact{
 		Name:  "LETANG HERME SOURDUN - Mme PATRICIA SIMOND",
 		Email: "Pour postuler: p.simond@etang-herme.fr",
 		Phone: "0102030405",
 		Info:  "Pour postuler: https://candidat.francetravail.fr/offres/recherche/detail/184BFDV",
 		IV:    "",
 	},
-	Place: labonnealternance.Place{
+	Place: lbaapi.Place{
 		Distance:          0,
 		FullAddress:       "77 - HERME 77114",
 		Latitude:          48.483968,
@@ -36,7 +37,7 @@ var peJob = &labonnealternance.PeJob{
 		Region:            "Île-de-France",
 		RemoteOnly:        false,
 	},
-	Company: labonnealternance.Company{
+	Company: lbaapi.Company{
 		ID:            "5fd56d6d83a02f00081ef8b1",
 		UAI:           "0623280D",
 		Name:          "LETANG HERME SOURDUN",
@@ -48,10 +49,10 @@ var peJob = &labonnealternance.PeJob{
 		URL:           "https://www.etang-herme.fr",
 		Mandataire:    false,
 		CreationDate:  "",
-		Place:         labonnealternance.Place{},
-		Headquarter:   labonnealternance.Headquarter{},
+		Place:         lbaapi.Place{},
+		Headquarter:   lbaapi.Headquarter{},
 	},
-	Job: labonnealternance.Job{
+	Job: lbaapi.Job{
 		ID:                   "184BFDV",
 		Description:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 		EmployeurDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -65,12 +66,12 @@ var peJob = &labonnealternance.PeJob{
 		DureeContrat:         "24 Mois",
 		QuantiteContrat:      0,
 	},
-	Romes: []labonnealternance.Rome{
+	Romes: []lbaapi.Rome{
 		{
 			Code: "A1101",
 		},
 	},
-	Nafs: []labonnealternance.Naf{},
+	Nafs: []lbaapi.Naf{},
 }
 
 func TestTranslatePlace(t *testing.T) {
@@ -142,7 +143,6 @@ func TestTranslateOffer(t *testing.T) {
 }
 
 func TestTranslateOfferNoTitle(t *testing.T) {
-
 	t.Parallel()
 
 	job := *peJob

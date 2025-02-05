@@ -6,18 +6,19 @@ import (
 	"scrapperjaltup/util"
 	"time"
 
+	"github.com/alex-cos/lbaapi"
 	"github.com/gosimple/slug"
 )
 
 type LBA struct {
-	api           *lba.LaBonneAlternance
+	api           *lbaapi.LaBonneAlternance
 	romes         []string
 	sleepDuration time.Duration
 }
 
 func NewLBA() Source {
 	return &LBA{
-		api:           lba.New(),
+		api:           lbaapi.New("contact@a26k.ch"),
 		romes:         lba.GetRomeCodes(),
 		sleepDuration: 250 * time.Millisecond,
 	}

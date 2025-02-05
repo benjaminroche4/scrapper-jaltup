@@ -53,7 +53,6 @@ func (thiz *AltPro) RetrieveOffers(setProgression func(int)) ([]*model.Offer, er
 }
 
 func (thiz *AltPro) RetrieveCategories(setProgression func(int)) ([]model.Category, error) {
-
 	return []model.Category{}, nil
 }
 

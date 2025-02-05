@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/alex-cos/lbaapi"
 	_slug "github.com/gosimple/slug"
 )
 
@@ -19,7 +20,7 @@ const (
 	PremiumDuration = 7 * 24 * time.Hour
 )
 
-func TranslatePlace(in *Place) *model.Place {
+func TranslatePlace(in *lbaapi.Place) *model.Place {
 	address := in.Address
 	if address == "" {
 		address = in.FullAddress
@@ -50,7 +51,7 @@ func TranslatePlace(in *Place) *model.Place {
 	}
 }
 
-func TranslateJob(in *PeJob) *model.Job {
+func TranslateJob(in *lbaapi.PeJob) *model.Job {
 	duration, err := strconv.ParseInt(in.Job.Duration, 10, 16)
 	if err != nil {
 		duration = 0
@@ -70,7 +71,7 @@ func TranslateJob(in *PeJob) *model.Job {
 	}
 }
 
-func TranslateCompany(in *PeJob) *model.Company {
+func TranslateCompany(in *lbaapi.PeJob) *model.Company {
 	c := cases.Title(language.French)
 	company := &model.Company{}
 
@@ -100,7 +101,7 @@ func TranslateCompany(in *PeJob) *model.Company {
 	return company
 }
 
-func TranslateOffer(in *PeJob) *model.Offer {
+func TranslateOffer(in *lbaapi.PeJob) *model.Offer {
 	var offer model.Offer
 
 	createdAt, err := time.Parse(time.RFC3339, in.Job.CreationDate)

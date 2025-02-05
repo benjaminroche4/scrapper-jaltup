@@ -1,9 +1,10 @@
 module scrapperjaltup
 
-go 1.22.0
+go 1.23.5
 
 require (
 	github.com/alex-cos/geoapi v0.1.0
+	github.com/alex-cos/lbaapi v0.1.0
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/derektata/lorem v0.0.2
 	github.com/go-sql-driver/mysql v1.8.1
