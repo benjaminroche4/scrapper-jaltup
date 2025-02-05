@@ -311,7 +311,7 @@ func createPlace(name string) *model.Place {
 	zipCode := ""
 	latitude := 0.0
 	longitude := 0.0
-	city := cities.FindCity(name)
+	city := cities.GetCityMapper().FindCity(name)
 	if city != nil {
 		zipCode = city.ZipCode
 		latitude = city.Latitude

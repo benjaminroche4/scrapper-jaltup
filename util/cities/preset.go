@@ -1,22 +1,5 @@
 package cities
 
-import (
-	"time"
-
-	_slug "github.com/gosimple/slug"
-
-	"github.com/alex-cos/geoapi"
-)
-
-type City struct {
-	Name       string  `json:"name"`
-	ZipCode    string  `json:"zipCode"`
-	Department string  `json:"department"`
-	Region     string  `json:"region"`
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-}
-
 // nolint: lll,misspell
 var cities = map[string]*City{
 	"paris":                          {"Paris", "75001", "Paris", "Île-de-France", 48.858900, 2.347000},
@@ -2006,41 +1989,4 @@ var cities = map[string]*City{
 	"sainghin-en-weppes":             {"Sainghin-en-Weppes", "59184", "Nord", "Hauts-de-France", 50.556400, 2.897200},
 	"rives-du-loir-en-anjou":         {"Rives-du-Loir-en-Anjou", "49140", "Maine-et-Loire", "Pays de la Loire", 47.557200, -0.444800},
 	"viry":                           {"Viry", "74580", "Haute-Savoie", "Auvergne-Rhône-Alpes", 46.115000, 6.022900},
-}
-
-func FindCity(name string) *City {
-	slug := _slug.Make(name)
-	city, ok := cities[slug]
-
-	if ok {
-		return city
-	}
-
-	api := geoapi.NewWithTimeout(5 * time.Second)
-	items, err := api.SearchMunicipality(name)
-	if err == nil {
-		for _, item := range items[:min(10, len(items))] {
-			if slug == _slug.Make(item.Name) {
-				geocity, err := api.GetDetailedMunicipality(item.Code)
-				if err == nil {
-					zipcode := ""
-					if len(geocity.PostalCodes) > 0 {
-						zipcode = geocity.PostalCodes[0]
-					}
-					newCity := &City{
-						Name:       geocity.Name,
-						ZipCode:    zipcode,
-						Department: geocity.Department.Name,
-						Region:     geocity.Region.Name,
-						Latitude:   geocity.Center.Latitude(),
-						Longitude:  geocity.Center.Longitude(),
-					}
-					cities[slug] = newCity
-					return newCity
-				}
-			}
-		}
-	}
-
-	return nil
 }

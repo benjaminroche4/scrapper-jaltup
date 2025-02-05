@@ -25,7 +25,7 @@ func TranslatePlace(in *Place) *model.Place {
 		address = in.FullAddress
 	}
 	name := util.CleanCityName(in.City)
-	city := cities.FindCity(name)
+	city := cities.GetCityMapper().FindCity(name)
 	zipCode := in.ZipCode
 	latitude := in.Latitude
 	longitude := in.Longitude
