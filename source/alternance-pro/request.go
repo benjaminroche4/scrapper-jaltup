@@ -26,8 +26,7 @@ const (
 	// APIUserAgent identifies this library with the API.
 	APIUserAgent = "Jaltup"
 
-	ValidDuration   = 30 * 24 * time.Hour
-	PremiumDuration = 7 * 24 * time.Hour
+	ValidDuration = 30 * 24 * time.Hour
 )
 
 // AlternancePro represents Client connection API.
@@ -344,11 +343,7 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 	company := createCompany(jobDetails.CompanyName)
 	city := util.CleanCityName(jobDetails.City)
 	createdAt := time.Now().Truncate(24 * time.Hour)
-	endPremiumAt := createdAt.Add(PremiumDuration)
-	premium := false
-	if time.Now().Unix() < endPremiumAt.Unix() {
-		premium = true
-	}
+
 	return &model.Offer{
 		ID:       0,
 		Company:  *company,
@@ -368,9 +363,9 @@ func parseJob(doc *html.Node, req, slug string) (*model.Offer, error) {
 		Status:       "published",
 		CreatedAt:    createdAt,
 		EndAt:        createdAt.Add(ValidDuration),
-		EndPremiumAt: endPremiumAt,
+		EndPremiumAt: time.Unix(0, 0).UTC(),
 		Slug:         _slug.Make(title),
-		Premium:      premium,
+		Premium:      false,
 		ExternalID:   util.Truncate(slug, 255),
 		ServiceName:  "alternance-professionnelle",
 		Categories:   []model.Category{},

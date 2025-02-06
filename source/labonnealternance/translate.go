@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	ValidDuration   = 30 * 24 * time.Hour
-	PremiumDuration = 7 * 24 * time.Hour
+	ValidDuration = 30 * 24 * time.Hour
 )
 
 func TranslatePlace(in *lbaapi.Place) *model.Place {
@@ -108,7 +107,7 @@ func TranslateOffer(in *lbaapi.PeJob) *model.Offer {
 	if err != nil {
 		createdAt = time.Now().Truncate(24 * time.Hour)
 	}
-	endPremiumAt := createdAt.Add(PremiumDuration)
+
 	title := util.Truncate(strings.TrimSpace(in.Title), 120)
 	url := util.Truncate(strings.TrimSpace(in.URL), 255)
 	slug := _slug.Make(title)
@@ -127,12 +126,9 @@ func TranslateOffer(in *lbaapi.PeJob) *model.Offer {
 	offer.Status = status
 	offer.CreatedAt = createdAt
 	offer.EndAt = createdAt.Add(ValidDuration)
-	offer.EndPremiumAt = endPremiumAt
+	offer.EndPremiumAt = time.Unix(0, 0).UTC()
 	offer.Slug = slug
 	offer.Premium = false
-	if time.Now().Unix() < endPremiumAt.Unix() {
-		offer.Premium = true
-	}
 	offer.Company = *TranslateCompany(in)
 
 	return &offer

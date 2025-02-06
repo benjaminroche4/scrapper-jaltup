@@ -7,8 +7,13 @@ import (
 	_db "scrapperjaltup/db"
 	"scrapperjaltup/model"
 	"scrapperjaltup/source"
+	"time"
 
 	"github.com/liamg/loading/pkg/bar"
+)
+
+const (
+	PremiumDuration = 7 * 24 * time.Hour
 )
 
 type Matcher struct {
@@ -89,7 +94,7 @@ func (thiz *Matcher) Execute() error {
 		newOffers = append(newOffers, *offer)
 	}
 
-	err = thiz.db.InsertOffers(shuffleOffers(newOffers))
+	err = thiz.db.InsertOffers((markRandomPremium(shuffleOffers(newOffers))))
 	if err != nil {
 		return err
 	}
@@ -191,4 +196,19 @@ func shuffleOffers(offers []model.Offer) []model.Offer {
 		output = append(output, offers[index])
 		offers = append(offers[:index], offers[index+1:]...)
 	}
+}
+
+func markRandomPremium(offers []model.Offer) []model.Offer {
+	endPremiumAt := time.Now().UTC().Truncate(24 * time.Hour).Add(PremiumDuration)
+
+	output := []model.Offer{}
+	for i := range offers {
+		random, _ := rand.Int(rand.Reader, big.NewInt(int64(100)))
+		if random.Int64() <= 10 {
+			offers[i].Premium = true
+			offers[i].EndPremiumAt = endPremiumAt
+		}
+		output = append(output, offers[i])
+	}
+	return output
 }
